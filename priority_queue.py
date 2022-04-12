@@ -1,13 +1,19 @@
 import sys
 
 
+class Process:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+
 class MaxPriorityQueue():
     """Implementation of maximum priority queue using binary heap."""
 
     def __init__(self):
         """Initialize an instance of maximum priority queue."""
         self.heap = list()
-        self.size = 0
+        self.__size = 0
 
     def __parent(self, index):
         """Return the index of the parent."""
@@ -26,49 +32,52 @@ class MaxPriorityQueue():
         case the max-heap property is violated."""
         l = self.__left_child(index)
         r = self.__right_child(index)
-        if l <= self.size and self.heap[l] > self.heap[index]:
+        if l <= self.__size and self.heap[l].key > self.heap[index].key:
             largest = l
         else:
             largest = index
-        if r <= self.size and self.heap[r] > self.heap[largest]:
+        if r <= self.__size and self.heap[r].key > self.heap[largest].key:
             largest = r
         if largest != index:
             # Exchange the node with its largest child and recursively move down to maintain max-heap property
-            self.heap[i], self.heap[largest] = self.heap[largest], self.heap[i]
+            self.heap[index], self.heap[largest] = self.heap[largest], self.heap[index]
             self.__max_heapify(largest)
 
     @property
     def priority_queue(self):
-        return self.heap
+        return list(map(lambda x: x.key, self.heap))
 
-    def insert(self, key):
+    def insert(self, key, value):
         """Insert new element in the priority queue.
 
         Args:
             key
                 The priority of the element to be inserted.
+            value
+                The value of the element to be inserted.
         """
-        self.size += 1
-        self.heap.append(None)
-        # Set the last element's priority to a very small number initially and then finally increasing it to its actual value
-        self.heap[self.size-1] = -sys.maxsize
-        self.increase_key(self.size-1, key)
+        self.__size += 1
+        # Set the last element's priority to a very small number initially
+        process = Process(-sys.maxsize, value)
+        self.heap.append(process)
+        self.increase_key(self.__size-1, key)
 
     def maximum(self):
         """Return the element with the maximum priority (or the largest key)."""
-        if self.size < 1:
+        if self.__size < 1:
             print("Heap underflow!")
             return -1
-        return self.heap[0]
+        return self.heap[0].key
 
     def extract_max(self):
         """Remove and return the element with the maximum priority (or the largest key)."""
-        if self.size < 1:
+        if self.__size < 1:
             print("Heap underflow!")
             return -1
         max_element = self.heap[0]
-        self.heap[0] = self.heap[self.size-1]
+        self.heap[0] = self.heap[self.__size-1]
         self.__max_heapify(0)
+        return max_element.key
 
     def increase_key(self, index, key):
         """Increase the value of element in position 'index' to new value key.
@@ -79,10 +88,10 @@ class MaxPriorityQueue():
             key
                 The new priority for the element in position 'index'.
         """
-        if key < self.heap[index]:
+        if key < self.heap[index].key:
             print("New key is smaller than the current key!")
-        self.heap[index] = key
-        while index > 0 and self.heap[self.__parent(index)] < self.heap[index]:
+        self.heap[index].key = key
+        while index > 0 and self.heap[self.__parent(index)].key < self.heap[index].key:
             # Exchange the element with its parent
             self.heap[index], self.heap[self.__parent(index)] = self.heap[self.__parent(index)], self.heap[index]
             index = self.__parent(index)
@@ -91,9 +100,9 @@ class MaxPriorityQueue():
 if __name__ == "__main__":
     mpq = MaxPriorityQueue()
 
-    mpq.insert(10)
-    mpq.insert(2)
-    mpq.insert(20)
+    mpq.insert(10, "Value for 10")
+    mpq.insert(2, "Value for 2")
+    mpq.insert(20, "Value for 20")
     # mpq.insert(30)
     # mpq.insert(15)
     print(mpq.priority_queue)
