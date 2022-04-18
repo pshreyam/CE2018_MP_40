@@ -19,7 +19,6 @@ class MaxPriorityQueue():
     def __init__(self):
         """Initialize an instance of maximum priority queue."""
         self.__heap = list()
-        self.__size = 0
 
     def __parent(self, index):
         """Return the index of the parent."""
@@ -38,16 +37,21 @@ class MaxPriorityQueue():
         case the max-heap property is violated."""
         l = self.__left_child(index)
         r = self.__right_child(index)
-        if l <= self.__size and self.__heap[l].key > self.__heap[index].key:
+        if l <= self.__size - 1 and self.__heap[l].key > self.__heap[index].key:
             largest = l
         else:
             largest = index
-        if r <= self.__size and self.__heap[r].key > self.__heap[largest].key:
+        if r <= self.__size - 1 and self.__heap[r].key > self.__heap[largest].key:
             largest = r
         if largest != index:
             # Exchange the node with its largest child and recursively move down to maintain max-heap property
             self.__heap[index], self.__heap[largest] = self.__heap[largest], self.__heap[index]
             self.__max_heapify(largest)
+
+    @property
+    def __size(self):
+        """Return the size of the heap."""
+        return len(self.__heap)
 
     @property
     def priority_queue(self):
@@ -65,7 +69,6 @@ class MaxPriorityQueue():
             value
                 The value of the element to be inserted.
         """
-        self.__size += 1
         # Set the last element's priority to a very small number initially
         process = Process(-sys.maxsize, value)
         self.__heap.append(process)
@@ -76,7 +79,7 @@ class MaxPriorityQueue():
         if self.__size < 1:
             # ERROR: Heap underflow!
             return False
-        return self.__heap[0].key
+        return self.__heap[0].key, self.__heap[0].value
 
     def extract_max(self):
         """Remove and return the element with the maximum priority (or the largest key)."""
@@ -85,9 +88,9 @@ class MaxPriorityQueue():
             return False
         max_element = self.__heap[0]
         self.__heap[0] = self.__heap[self.__size-1]
-        self.__size -= 1
+        self.__heap.pop()
         self.__max_heapify(0)
-        return max_element.key
+        return max_element.key, max_element.value
 
     def increase_key(self, index, key):
         """Increase the value of element in position 'index' to new value key.
@@ -98,10 +101,14 @@ class MaxPriorityQueue():
             key
                 The new priority for the element in position 'index'.
         """
+        if index < 0 or index >= self.__size:
+            # ERROR: invalid index
+            return False
         if key < self.__heap[index].key:
             # ERROR: New key is smaller than the current key!
             return False
         self.__heap[index].key = key
+
         while index > 0 and self.__heap[self.__parent(index)].key < self.__heap[index].key:
             # Exchange the element with its parent
             self.__heap[index], self.__heap[self.__parent(index)] = self.__heap[self.__parent(index)], self.__heap[index]
