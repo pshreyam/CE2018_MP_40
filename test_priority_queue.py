@@ -41,6 +41,7 @@ class TestMaxPriorityQueue(unittest.TestCase):
 
     def test_maximum(self):
         self.assertTupleEqual(self.mpq.maximum(), (30, "Value for 30"))
+        self.assertTupleEqual(self.mpq.maximum(), (30, "Value for 30"))
         # Less than the smallest key in the priority queue
         self.mpq.insert(1, "Value for 1")
         self.assertTupleEqual(self.mpq.maximum(), (30, "Value for 30"))
